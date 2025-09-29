@@ -1,20 +1,23 @@
 
 class player:
     def __init__(self):
-        self.inventory = ["TEDDY"]
+        self.inventory = []
         self.hp = 5
-        self.position = "MY BEDROOM"
-        self.actions = ["USE","TAKE"]
+        self.position = "BEDROOM"
+        self.actions = {"HELP":"display list of commands",
+                        "STATE":"display current character state",
+                        "USE ~item~":"use the item (example: USE CLOSET)",
+                        "TAKE ~item~":"put item in inventory (example: TAKE APPLE)"}
     
     def move(self,new_location):
         self.position = new_location
         return
     
-    def pick_up(self,thing):
+    def take(self,thing):
         self.inventory.append(thing)
         return
     
-    def use_thing(self,thing):
+    def consume(self,thing):
         if thing in self.inventory:
             self.inventory.remove(thing)
             return True
@@ -34,37 +37,93 @@ class player:
     
 class hunted_house:
     def __init__(self):
+
+        # Defines the rooms that can be assesed from the starting location
         self.room_connections = {
-            "MY BEDROOM":["HALLWAY"],
-            "HALLWAY":["MY BEDROOM","MOM'S BEDROOM", "BATHROOM","LIVING ROOM"],
+            "BEDROOM":["HALLWAY"],
+            "HALLWAY":["BEDROOM","MOM'S ROOM", "BATHROOM","LIVING ROOM"],
             "BATHROOM":["HALLWAY"],
             "LIVING ROOM":["HALLWAY","KITCHEN"],
-            "KITCHEN":["LIVING ROOM","BASEMENT"],
-            "BASEMENT":["KITCHEN"]
+            "KITCHEN":["LIVING ROOM","BASEMENT"]
         }
 
-        self.interactable_setpieces = {
-            "MY BEDROOM":["LAMP","CLOSET","BED","DOOR"]
+        self.room_descriptions = {
+            "BEDROOM":"'It's smaller than my old bedroom. I have a lamp and a new bed, Teddy sits on it.\nI hear noises coming from my closet, mom doesn't believe me.'",
+            "HALLWAY":"",
+            "BATHROOM":"",
+            "LIVING ROOM":"",
+            "KITCHEN":"",
+            "BASEMENT":""
         }
 
-        self.interactable_things = {
-            "MY BEDROOM":[""]
+        # Defines the things that USE interacts with
+        self.usable_things = {
+            "BEDROOM":{"LAMP":["'It doesn't work...\nMaybe the power is out...'"],
+                          "CLOSET":["~The monster wraps around you and pulls you into the darkness.\nNo one comes to save you.~",
+                                    "~TEDDY protects you.\nThe monster can't touch you.\nYou get LIGHTSABER~"],
+                          "BED":["'I'm scared...\nI can't sleep...'"],}
         }
+
+        # Defines the things that TAKE interacts with
+        self.takeable_things = {
+            "BEDROOM":{"TEDDY":["~A pink teddy bear.\nIt's missing an eye.~"]}
+        }
+
+    def get_connected_locations(self,current_location):
+        for room, connections_list in self.room_connections.items():
+            if room == current_location:
+                return connections_list
+        return False
     
-    def validate_movement(self,current_location,new_location):
+    def validate_movement(self,current_location,new_location,inventory):
         for room, connections_list in self.room_connections.items():
             if room == current_location:
                 for connection in connections_list:
+                    if connection == "MOM'S ROOM":
+                        print("'I'm not allowed to go in there...'")
+                        return False
+                    if connection == "BASEMENT":
+                        if "KEY" in inventory:
+                            return True
+                        else:
+                            print("'I don't have the key...'")
+                            return False
                     if connection == new_location:
                         return True
                 return False
         return False
     
-    def eliminate_thing(self,current_location,thing_to_eliminate):
-        for room, things_list in self.interactable_things.items():
-            if room == current_location:
-                for thing in things_list:
-                    if thing == thing_to_eliminate:
+    def use(self,current_position, usable_thing, inventory):
+        for room,dictionary in self.usable_things.items():
+            if room == current_position:
+                for thing, description in dictionary.items():
+                    if thing == usable_thing:
+                        if thing == "CLOSET":
+                            if "TEDDY" in inventory:
+                                print(f"{description[1]}\n")
+                                return "LIGHTSABER"
+                            else:
+                                print(f"{description[0]}\n")
+                                return "GAME OVER"
+                        else:
+                            print(f"{description[0]}\n")
+                        return 
+                print(f"Can't USE {usable_thing}.\n")
+                return
+        print(f"Can't USE {usable_thing}.\n")
+        return 
+    
+    def take(self,current_position,takeable_thing,inventory):
+        if takeable_thing in inventory:
+            print(f"{takeable_thing} is already in your inventory.\n")
+            return False
+        for room,dictionary in self.takeable_things.items():
+            if room == current_position:
+                for thing, description in dictionary.items():
+                    if thing == takeable_thing:
+                        print(f"{description[0]}\n")
                         return True
+                print(f"Can't TAKE {takeable_thing}.\n")
                 return False
-        return False
+        print(f"Can't TAKE {takeable_thing}.\n")
+        return False   
