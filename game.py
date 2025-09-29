@@ -27,8 +27,13 @@ def run():
                 me.take("LIGHTSABER")
         if action[0] == "TAKE":
             outcome = setting.take(me.position,action[1],me.inventory)
-            if outcome == True:
+            if outcome == "GAME OVER":
+                print(f".......................................................\nGAME OVER\n.......................................................\n")
+                break
+            elif outcome == True:
                 me.take(action[1])
+        else:
+            print("...what?\n")
 
 
 run()

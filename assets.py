@@ -38,6 +38,8 @@ class player:
 class hunted_house:
     def __init__(self):
 
+        self.apple_counter = 0
+
         # Defines the rooms that can be assesed from the starting location
         self.room_connections = {
             "BEDROOM":["HALLWAY"],
@@ -116,6 +118,23 @@ class hunted_house:
     def take(self,current_position,takeable_thing,inventory):
         if takeable_thing in inventory:
             print(f"{takeable_thing} is already in your inventory.\n")
+            return False
+        if takeable_thing == "APPLE":
+            if self.apple_counter == 0:
+                print(f"..........what?\n")
+                self.apple_counter += 1
+            elif self.apple_counter == 1:
+                print(f"Ooohh... like from.... HELP...\nhaha... clever...\n")
+                self.apple_counter += 1
+            elif self.apple_counter == 2:
+                print(f"Yeah, I get it.\nYou can actually play the game now.\n")
+                self.apple_counter += 1
+            elif self.apple_counter == 3:
+                print(f"...\n")
+                self.apple_counter += 1
+            elif self.apple_counter == 4:
+                print(f"Here, go have an apple.")
+                return "GAME OVER"
             return False
         for room,dictionary in self.takeable_things.items():
             if room == current_position:
