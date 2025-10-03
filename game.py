@@ -9,6 +9,7 @@ def run():
     setting = hunted_house()
     print(f".......................................................\nHUNTED HOUSE\nActions: {list(me.actions.keys())}\n.......................................................\n")
     display_state(me,setting)
+    print(setting.room_descriptions)
     while True:
         action = input("> ").upper().split(" ")
         print()
@@ -16,16 +17,16 @@ def run():
             for key, value in me.actions.items():
                 print(f"{key}: {value}")
             print()
-        if action[0] == "STATE":
+        elif action[0] == "STATE":
             display_state(me,setting)
-        if action[0] == "USE":
+        elif action[0] == "USE":
             outcome = setting.use(me.position,action[1],me.inventory)
             if outcome == "GAME OVER":
                 print(f".......................................................\nGAME OVER\n.......................................................\n")
                 break
             elif outcome == "LIGHTSABER":
                 me.take("LIGHTSABER")
-        if action[0] == "TAKE":
+        elif action[0] == "TAKE":
             outcome = setting.take(me.position,action[1],me.inventory)
             if outcome == "GAME OVER":
                 print(f".......................................................\nGAME OVER\n.......................................................\n")

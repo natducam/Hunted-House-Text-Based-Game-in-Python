@@ -50,7 +50,7 @@ class hunted_house:
         }
 
         self.room_descriptions = {
-            "BEDROOM":"'It's smaller than my old bedroom. I have a lamp and a new bed, Teddy sits on it.\nI hear noises coming from my closet, mom doesn't believe me.'",
+            "BEDROOM":"'My new bedroom is smaller than my old bedroom. I have a lamp and a new bed.\nI hear noises coming from my closet, mom doesn't believe me.'",
             "HALLWAY":"",
             "BATHROOM":"",
             "LIVING ROOM":"",
@@ -61,9 +61,9 @@ class hunted_house:
         # Defines the things that USE interacts with
         self.usable_things = {
             "BEDROOM":{"LAMP":["'It doesn't work...\nMaybe the power is out...'"],
-                          "CLOSET":["~The monster wraps around you and pulls you into the darkness.\nNo one comes to save you.~",
-                                    "~TEDDY protects you.\nThe monster can't touch you.\nYou get LIGHTSABER~"],
-                          "BED":["'I'm scared...\nI can't sleep...'"],}
+                       "CLOSET":["~The monster wraps around you and pulls you into the darkness.\nNo one comes to save you.~",
+                                "~TEDDY protects you.\nThe monster can't touch you.\nYou get LIGHTSABER~"],
+                        "BED":["'I'm scared...\nI can't sleep...'"],}
         }
 
         # Defines the things that TAKE interacts with
@@ -76,6 +76,11 @@ class hunted_house:
             if room == current_location:
                 return connections_list
         return False
+    
+    def display_description(self,current_location):
+        for room, description in self.room_descriptions:
+            if room == current_location:
+                print(f"{description}\n")
     
     def validate_movement(self,current_location,new_location,inventory):
         for room, connections_list in self.room_connections.items():
